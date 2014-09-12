@@ -2,14 +2,12 @@
 #include <string>
 #include <map>
 #include <deque>
-
+#include <algorithm>
 using namespace std;
 
-int current_token = 0;
-string tiny(string u, string dict, map<int, string> & record){
+string tiny(string u, string dict, map<int, string> & record, int current_token){
   int base = dict.length();  
-  record.insert(pair<int, string>(current_token, u));
-  
+  record.insert(pair<int, string>(current_token, u));  
   /*
    * Map current token to a 8-bit string
    */
@@ -33,8 +31,6 @@ string tiny(string u, string dict, map<int, string> & record){
   for(it = digits.begin(); it != digits.end(); it++){
     shorten_string.insert(shorten_string.end(), dict[*it]);
   }
-  
-  current_token++;
 
   return shorten_string;
 }
@@ -50,28 +46,32 @@ string origin(string s, string dict, map<int, string> & record){
    */
   int base = dict.length();
   int id = 0, count = 0;
-  string::iterator it;
-  char *cstr = new char [s.length() + 1];
-  strcpy(cstr, s.c_str());
+  reverse(s.begin(), s.end());
   for(int i=0;i<s.length();i++){
-    int index = dict.at(cstr[i]);
-    id += id*count_pow(base, count);
+    int index = dict.find(s[i], 0);
+    id += index * count_pow(base, count);
     count++;
   }
-  return record[count];
+  cout<<endl;
+  cout<<"ID retrieved: "<<id<<endl;
+  return record[id];
 }
 
 int main(){
   string dict = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.?-+!/:";
   map<int, string> record;
-  //  for(int i=0;i<5;i++){
+  int token = 0;
+  for(int i=0;i<5;i++){
     string url;
     cin>>url;
     cout<<"Input = "<<url<<endl;
     
-    cout<<"Tinyurl = "<<tiny(url, dict, record)<<endl;
-    cout<<"Origin url = "<<origin(url, dict, record)<<endl;
+    string tinyurl = tiny(url, dict, record, token);
+    token++;
+    cout<<"Tinyurl = "<<tinyurl<<endl;
+    cout<<"Origin url = "<<origin(tinyurl, dict, record)<<endl;
     cout<<endl;
-    //  }
+  }
+
   return 0;
 }
